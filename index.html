@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIAIC Venue Booking Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .booking-form, .bookings-list, .admin-login {
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            flex: 1;
+        }
+        
+        .capacity-info {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #f2f2f2;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .confirmation-message {
+            padding: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo img {
+            max-width: 200px;
+        }
+        
+        .time-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .time-input {
+            flex: 1;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .confirmed-booking {
+            background-color: #e8f7ed;
+        }
+        
+        .status-label {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+            
+            .time-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .time-input {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <!-- Placeholder for logo -->
+            <h2>TIAIC</h2>
+        </div>
+        
+        <h1>TIAIC Venue Booking Schedule</h1>
+        
+        <div class="tab-buttons">
+            <button id="bookingTabBtn" class="tab-button active">Book a Venue</button>
+            <button id="adminTabBtn" class="tab-button">Admin Access</button>
+        </div>
+        
+        <div id="bookingTab" class="booking-form">
+            <h2>Book a Venue</h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="eventDate">Date of Event:</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Time Period:</label>
+                    <div class="time-input-group">
+                        <div class="time-input">
+                            <label for="startTime">Start Time:</label>
+                            <input type="time" id="startTime" required min="08:00" max="19:00">
+                        </div>
+                        <div class="time-input">
+                            <label for="endTime">End Time:</label>
+                            <input type="time" id="endTime" required min="09:00" max="20:00">
+                        </div>
+                    </div>
+                    <small>Operating hours: 08:00 - 20:00</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="venue">Venue:</label>
+                    <select id="venue" required>
+                        <option value="">-- Select a Venue --</option>
+                        <option value="Training Room">Training Room (24 Pax)</option>
+                        <option value="Roadshow Room">Roadshow Room (50 Pax)</option>
+                        <option value="Meeting Room A">Meeting Room A (10 Pax)</option>
+                        <option value="Meeting Room B">Meeting Room B (6 Pax)</option>
+                        <option value="Meeting Room VIP">Meeting Room VIP (8 Pax)</option>
+                        <option value="Pantry Area">Pantry Area (10 Pax)</option>
+                        <option value="Open Coach Space">Open Coach Space (20 Pax)</option>
+                        <option value="Tea Room">Tea Room (4-20 Pax)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupSize">Group Size:</label>
+                    <input type="number" id="groupSize" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookedBy">Booked By:</label>
+                    <input type="text" id="bookedBy" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes:</label>
+                    <textarea id="notes"></textarea>
+                </div>
+                
+                <button type="submit">Book Venue</button>
+            </form>
+            
+            <div id="confirmationMessage" class="confirmation-message hidden">
+                Thank you for your booking request! We will confirm your booking after your payment.
+            </div>
+        </div>
+        
+        <div id="adminTab" class="hidden">
+            <div id="adminLogin" class="admin-login">
+                <h2>Admin Login</h2>
+                <p>Access to booking information is restricted to Tembusu Institute staff only.</p>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Enter company password">
+                </div>
+                
+                <button id="loginBtn">Login</button>
+            </div>
+            
+            <div id="bookingsList" class="bookings-list hidden">
+                <h2>Current Bookings</h2>
+                <button id="logoutBtn" style="float: right; background-color: #e74c3c;">Logout</button>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filterDate">Filter by Date:</label>
+                        <input type="date" id="filterDate">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterVenue">Filter by Venue:</label>
+                        <select id="filterVenue">
+                            <option value="">All Venues</option>
+                            <option value="Training Room">Training Room</option>
+                            <option value="Roadshow Room">Roadshow Room</option>
+                            <option value="Meeting Room A">Meeting Room A</option>
+                            <option value="Meeting Room B">Meeting Room B</option>
+                            <option value="Meeting Room VIP">Meeting Room VIP</option>
+                            <option value="Pantry Area">Pantry Area</option>
+                            <option value="Open Coach Space">Open Coach Space</option>
+                            <option value="Tea Room">Tea Room</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterStatus">Filter by Status:</label>
+                        <select id="filterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Venue</th>
+                            <th>Group Size</th>
+                            <th>Booked By</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Admin Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Bookings will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get stored bookings or initialize empty array
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            
+            // DOM elements
+            const bookingForm = document.getElementById('bookingForm');
+            const bookingsTable = document.getElementById('bookingsTable').getElementsByTagName('tbody')[0];
+            const filterDate = document.getElementById('filterDate');
+            const filterVenue = document.getElementById('filterVenue');
+            const filterStatus = document.getElementById('filterStatus');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            const startTime = document.getElementById('startTime');
+            const endTime = document.getElementById('endTime');
+            
+            // Tabs
+            const bookingTab = document.getElementById('bookingTab');
+            const adminTab = document.getElementById('adminTab');
+            const bookingTabBtn = document.getElementById('bookingTabBtn');
+            const adminTabBtn = document.getElementById('adminTabBtn');
+            
+            // Admin sections
+            const adminLogin = document.getElementById('adminLogin');
+            const bookingsList = document.getElementById('bookingsList');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const adminPassword = document.getElementById('adminPassword');
+            
+            // Company password - in a real app, this would be server-side
+            const companyPassword = "TIAIC2025";
+            
+            // Format date for display
+            function formatDate(dateString) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            // Display bookings in the table
+            function displayBookings() {
+                // Clear the table
+                bookingsTable.innerHTML = '';
+                
+                // Get filter values
+                const dateFilter = filterDate.value;
+                const venueFilter = filterVenue.value;
+                const statusFilter = filterStatus.value;
+                
+                // Filter bookings
+                let filteredBookings = bookings;
+                
+                if (dateFilter) {
+                    filteredBookings = filteredBookings.filter(booking => booking.eventDate === dateFilter);
+                }
+                
+                if (venueFilter) {
+                    filteredBookings = filteredBookings.filter(booking => booking.venue === venueFilter);
+                }
+                
+                if (statusFilter) {
+                    filteredBookings = filteredBookings.filter(booking => booking.status === statusFilter);
+                }
+                
+                // Sort bookings by date (most recent first)
+                filteredBookings.sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+                
+                // Add bookings to table
+                if (filteredBookings.length === 0) {
+                    const row = bookingsTable.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.colSpan = 10;
+                    cell.textContent = 'No bookings found';
+                    cell.style.textAlign = 'center';
+                    return;
+                }
+                
+                filteredBookings.forEach((booking, index) => {
+                    const row = bookingsTable.insertRow();
+                    
+                    // Add class for confirmed bookings
+                    if (booking.status === 'confirmed') {
+                        row.classList.add('confirmed-booking');
+                    }
+                    
+                    row.insertCell(0).textContent = formatDate(booking.eventDate);
+                    row.insertCell(1).textContent = `${booking.startTime} - ${booking.endTime}`;
+                    row.insertCell(2).textContent = booking.venue;
+                    row.insertCell(3).textContent = booking.groupSize;
+                    row.insertCell(4).textContent = booking.bookedBy;
+                    row.insertCell(5).textContent = booking.email;
+                    
+                    // Status cell
+                    const statusCell = row.insertCell(6);
+                    const statusLabel = document.createElement('span');
+                    statusLabel.textContent = booking.status === 'confirmed' ? 'Confirmed' : 'Pending';
+                    statusLabel.classList.add('status-label');
+                    statusLabel.classList.add(booking.status === 'confirmed' ? 'status-confirmed' : 'status-pending');
+                    statusCell.appendChild(statusLabel);
+                    
+                    // Notes cell
+                    row.insertCell(7).textContent = booking.notes || '';
+                    
+                    // Admin notes cell
+                    const adminNotesCell = row.insertCell(8);
+                    const adminNotesInput = document.createElement('textarea');
+                    adminNotesInput.value = booking.adminNotes || '';
+                    adminNotesInput.rows = 2;
+                    adminNotesInput.style.width = '100%';
+                    adminNotesInput.addEventListener('change', function() {
+                        // Update the booking with the new admin notes
+                        const bookingIndex = bookings.findIndex(b => 
+                            b.eventDate === booking.eventDate && 
+                            b.venue === booking.venue && 
+                            b.startTime === booking.startTime &&
+                            b.endTime === booking.endTime &&
+                            b.bookedBy === booking.bookedBy
+                        );
+                        
+                        if (bookingIndex !== -1) {
+                            bookings[bookingIndex].adminNotes = adminNotesInput.value;
+                            localStorage.setItem('bookings', JSON.stringify(bookings));
+                        }
+                    });
+                    adminNotesCell.appendChild(adminNotesInput);
+                    
+                    // Actions cell
+                    const actionsCell = row.insertCell(9);
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'action-buttons';
+                    
+                    // Cancel button
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Cancel';
+                    deleteButton.style.backgroundColor = '#e74c3c';
+                    deleteButton.onclick = function() {
+                        if (confirm('Are you sure you want to cancel this booking?')) {
+                            bookings.splice(bookings.findIndex(b => 
+                                b.eventDate === booking.eventDate && 
+                                b.venue === booking.venue && 
+                                b.startTime === booking.startTime &&
+                                b.endTime === booking.endTime &&
+                                b.bookedBy === booking.bookedBy
+                            ), 1);
+                            localStorage.setItem('bookings', JSON.stringify(bookings));
+                            displayBookings();
+                        }
+                    };
+                    actionsDiv.appendChild(deleteButton);
+                    
+                    // Confirm button - only show if not already confirmed
+                    if (booking.status !== 'confirmed') {
+                        const confirmButton = document.createElement('button');
+                        confirmButton.textContent = 'Confirm';
+                        confirmButton.style.backgroundColor = '#27ae60';
+                        confirmButton.onclick = function() {
+                            if (confirm('Confirm this booking? This will block this time slot from future bookings.')) {
+                                const bookingIndex = bookings.findIndex(b => 
+                                    b.eventDate === booking.eventDate && 
+                                    b.venue === booking.venue && 
+                                    b.startTime === booking.startTime &&
+                                    b.endTime === booking.endTime &&
+                                    b.bookedBy === booking.bookedBy
+                                );
+                                
+                                if (bookingIndex !== -1) {
+                                    bookings[bookingIndex].status = 'confirmed';
+                                    localStorage.setItem('bookings', JSON.stringify(bookings));
+                                    displayBookings();
+                                }
+                            }
+                        };
+                        actionsDiv.appendChild(confirmButton);
+                    }
+                    
+                    actionsCell.appendChild(actionsDiv);
+                });
+            }
+            
+            // Check if two time ranges overlap
+            function isTimeOverlap(startA, endA, startB, endB) {
+                return (startA < endB && endA > startB);
+            }
+            
+            // Check if booking time is valid
+            function isValidBookingTime(start, end) {
+                // Ensure end time is after start time
+                return start < end;
+            }
+            
+            // Check if there's a confirmed booking that conflicts with the requested time
+            function hasConfirmedBookingConflict(date, venue, startTime, endTime) {
+                return bookings.some(booking => 
+                    booking.eventDate === date && 
+                    booking.venue === venue && 
+                    booking.status === 'confirmed' && 
+                    isTimeOverlap(startTime, endTime, booking.startTime, booking.endTime)
+                );
+            }
+            
+            // Handle form submission
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const eventDate = document.getElementById('eventDate').value;
+                const startTimeValue = document.getElementById('startTime').value;
+                const endTimeValue = document.getElementById('endTime').value;
+                const venue = document.getElementById('venue').value;
+                const groupSize = document.getElementById('groupSize').value;
+                const bookedBy = document.getElementById('bookedBy').value;
+                const email = document.getElementById('email').value;
+                const notes = document.getElementById('notes').value;
+                
+                // Validate time inputs
+                if (!startTimeValue || !endTimeValue) {
+                    alert('Please select both start and end times');
+                    return;
+                }
+                
+                // Check if end time is after start time
+                if (!isValidBookingTime(startTimeValue, endTimeValue)) {
+                    alert('End time must be after start time');
+                    return;
+                }
+                
+                // Basic validation for group size
+                const maxCapacity = {
+                    'Training Room': 24,
+                    'Roadshow Room': 50,
+                    'Meeting Room A': 10,
+                    'Meeting Room B': 6,
+                    'Meeting Room VIP': 8,
+                    'Pantry Area': 10,
+                    'Open Coach Space': 20,
+                    'Tea Room': 20
+                };
+                
+                if (parseInt(groupSize) > maxCapacity[venue]) {
+                    alert(`This venue has a maximum capacity of ${maxCapacity[venue]} people. Please select a different venue or reduce your group size.`);
+                    return;
+                }
+                
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                // Check for confirmed booking conflicts
+                if (hasConfirmedBookingConflict(eventDate, venue, startTimeValue, endTimeValue)) {
+                    alert('This venue already has a confirmed booking that overlaps with your selected time period. Please choose a different time or venue.');
+                    return;
+                }
+                
+                // Check for existing bookings (pending) on the same date and venue with overlapping times
+                let timeConflict = false;
+                
+                bookings.forEach(booking => {
+                    if (booking.eventDate === eventDate && booking.venue === venue) {
+                        // Check for time conflicts with pending bookings
+                        if (booking.status === 'pending' && isTimeOverlap(startTimeValue, endTimeValue, booking.startTime, booking.endTime)) {
+                            timeConflict = true;
+                        }
+                    }
+                });
+                
+                if (timeConflict) {
+                    alert(`This venue already has a pending booking that overlaps with your selected time period. Please choose a different time or venue.`);
+                    return;
+                }
+                
+                // Add new booking with pending status
+                const newBooking = {
+                    eventDate,
+                    startTime: startTimeValue,
+                    endTime: endTimeValue,
+                    venue,
+                    groupSize,
+                    bookedBy,
+                    email,
+                    notes,
+                    adminNotes: '',
+                    status: 'pending'
+                };
+                
+                bookings.push(newBooking);
+                
+                // Save to localStorage
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                
+                // Reset form and show confirmation
+                bookingForm.reset();
+                bookingForm.style.display = 'none';
+                confirmationMessage.classList.remove('hidden');
+                
+                // Reset form after 5 seconds
+                setTimeout(() => {
+                    bookingForm.style.display = 'block';
+                    confirmationMessage.classList.add('hidden');
+                }, 5000);
+            });
+            
+            // Set up filter change handlers
+            filterDate.addEventListener('change', displayBookings);
+            filterVenue.addEventListener('change', displayBookings);
+            filterStatus.addEventListener('change', displayBookings);
+            
+            // Tab switching
+            bookingTabBtn.addEventListener('click', function() {
+                bookingTab.classList.remove('hidden');
+                adminTab.classList.add('hidden');
+                bookingTabBtn.classList.add('active');
+                adminTabBtn.classList.remove('active');
+            });
+            
+            adminTabBtn.addEventListener('click', function() {
+                bookingTab.classList.add('hidden');
+                adminTab.classList.remove('hidden');
+                bookingTabBtn.classList.remove('active');
+                adminTabBtn.classList.add('active');
+            });
+            
+            // Admin login
+            loginBtn.addEventListener('click', function() {
+                if (adminPassword.value === companyPassword) {
+                    adminLogin.classList.add('hidden');
+                    bookingsList.classList.remove('hidden');
+                    displayBookings();
+                } else {
+                    alert('Incorrect password. Access denied.');
+                }
+            });
+            
+            // Logout
+            logoutBtn.addEventListener('click', function() {
+                adminLogin.classList.remove('hidden');
+                bookingsList.classList.add('hidden');
+                adminPassword.value = '';
+            });
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('eventDate').min = today;
+            
+            // Set default times
+            startTime.value = "09:00";
+            endTime.value = "10:00";
+            
+            // Initialize existing bookings with status if not present
+            bookings.forEach(booking => {
+                if (!booking.hasOwnProperty('status')) {
+                    booking.status = 'pending';
+                }
+            });
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            
+            // Initial display
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                adminLogin.classList.add('hidden');
+                bookingsList.classList.remove('hidden');
+                displayBookings();
+            }
+        });
+    </script>
+</body>
+</html>
